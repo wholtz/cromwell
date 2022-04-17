@@ -5,7 +5,7 @@ set -o errexit -o nounset -o pipefail
 # shellcheck source=/dev/null
 source "${BASH_SOURCE%/*}/test.inc.sh" || source test.inc.sh
 # shellcheck source=/dev/null
-source "${BASH_SOURCE%/*}/test_singularity.inc.sh" || source test_slurm.inc.sh
+source "${BASH_SOURCE%/*}/test_singularity.inc.sh" || source test_singularity.inc.sh
 # shellcheck source=/dev/null
 source "${BASH_SOURCE%/*}/test_slurm.inc.sh" || source test_slurm.inc.sh
 
