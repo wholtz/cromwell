@@ -705,6 +705,91 @@ paths:
         '500':
           description: An unexpected error occurred.
           $ref: '#/responses/ServerError'
+  '/api/ga4gh/wes/v1/runs':
+    get:
+      tags:
+        - GA4GH Workflow Execution Service (WES) - Alpha preview
+      summary: List runs
+      description: >-
+        Runs are listed from newest to oldest. When paging through the list, the client
+        should not make assumptions about live updates, but should assume the
+        contents of the list reflect the workflow list at the moment that the
+        first page is requested. To monitor a specific workflow run, use
+        GetRunStatus or GetRunLog.
+      operationId: ListRuns
+      parameters:
+        - name: page_size
+          in: query
+          description: >-
+            OPTIONAL The preferred number of workflow runs to return in a page.
+            If not provided, the implementation should use a default page size.
+            The implementation must not return more items than `page_size`, but
+            it may return fewer.  Clients should not assume that if fewer than
+            `page_size` items are returned that all items have been returned. 
+            The availability of additional pages is indicated by the value of
+            `next_page_token` in the response.
+          type: integer
+          format: int64
+        - name: page_token
+          in: query
+          description: >-
+            OPTIONAL Token to use to indicate where to start getting results. If
+            unspecified, return the first page of results.
+          type: string
+      responses:
+        '200':
+          description: Successful Request
+          schema:
+            $ref: '#/definitions/RunListResponse'
+        '400':
+          description: The request is malformed.
+          $ref: '#/responses/BadRequest'
+        '401':
+          description: The request is unauthorized.
+          $ref: '#/responses/InvalidSubmission'
+        '403':
+          description: The requester is not authorized to perform this action.
+          $ref: '#/responses/Forbidden'
+        '500':
+          description: An unexpected error occurred.
+          $ref: '#/responses/ServerError'
+  '/api/ga4gh/wes/v1/runs/{run_id}':
+    get:
+      tags:
+        - GA4GH Workflow Execution Service (WES) - Alpha preview
+      summary: Get run log
+      description: >-
+        This endpoint provides detailed information about a given workflow run.
+        The returned result has information about the outputs produced by this
+        workflow (if available), a log object which allows the stderr and stdout
+        to be retrieved, a log array so stderr/stdout for individual tasks can
+        be retrieved, and the overall state of the workflow run (e.g. RUNNING,
+        see the State section).
+      operationId: GetRunLog
+      parameters:
+        - name: run_id
+          in: path
+          description: ''
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful Request
+          schema:
+            $ref: '#/definitions/RunLog'
+        '401':
+          description: The request is unauthorized.
+          $ref: '#/responses/InvalidSubmission'
+        '403':
+          description: The requester is not authorized to perform this action.
+          $ref: '#/responses/Forbidden'
+        '404':
+          description: The requested workflow run not found.
+          $ref: '#/responses/NotFound'
+        '500':
+          description: An unexpected error occurred.
+          $ref: '#/responses/ServerError'
+      deprecated: false
   '/api/ga4gh/wes/v1/runs/{run_id}/cancel':
     post:
       tags:
@@ -1768,3 +1853,4 @@ definitions:
           are also allowed. The version should be changed whenever the service
           is updated.
         example: 1.0.0
+

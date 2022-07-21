@@ -4,10 +4,6 @@ object Dependencies {
   private val akkaHttpCirceIntegrationV = "1.39.2"
   private val akkaHttpV = "10.1.15" // (CROM-6619)
   private val akkaV = "2.5.32" // scala-steward:off (CROM-6637)
-  private val aliyunBcsV = "6.2.4"
-  private val aliyunCoreV = "4.6.0"
-  private val aliyunCrV = "4.1.4"
-  private val aliyunOssV = "3.14.0"
   private val ammoniteOpsV = "2.4.1"
   private val apacheHttpClientV = "4.5.13"
   private val awsSdkV = "2.17.152"
@@ -44,10 +40,8 @@ object Dependencies {
   // latest date via: https://github.com/googleapis/google-api-java-client-services/blob/main/clients/google-api-services-cloudkms/v1.metadata.json
   private val googleCloudKmsV = "v1-rev20220104-1.32.1"
   private val googleCloudMonitoringV = "3.2.5"
-  // BW-808 Pinning googleCloudNioV to this tried-and-true old version and quieting Scala Steward.
-  // 0.121.2 is the most recent version currently known to work.
-  private val googleCloudNioV = "0.61.0-alpha" // scala-steward:off
-  private val googleCloudStorageV = "2.1.10"
+  private val googleCloudNioV = "0.124.8"
+  private val googleCloudStorageV = "2.9.2"
   private val googleGaxGrpcV = "2.12.2"
   // latest date via: https://mvnrepository.com/artifact/com.google.apis/google-api-services-genomics
   private val googleGenomicsServicesV2Alpha1ApiV = "v2alpha1-rev20210811-1.32.1"
@@ -63,7 +57,7 @@ object Dependencies {
   private val heterodonV = "1.0.0-beta3"
   private val hsqldbV = "2.6.1"
   private val http4sV = "0.21.31" // this release is EOL. We need to upgrade further for cats3. https://http4s.org/versions/
-  private val jacksonV = "2.13.2"
+  private val jacksonV = "2.13.3"
   private val janinoV = "3.1.6"
   private val jsr305V = "3.0.2"
   private val junitV = "4.13.2"
@@ -83,6 +77,10 @@ object Dependencies {
   private val mockitoV = "3.11.2"
   private val mockserverNettyV = "5.11.2"
   private val mouseV = "1.0.10"
+  /*
+  Newer version 8.0.29 fails `Control characters should work with metadata` Centaur tests, has charset changes mentioned in release notes
+  https://dev.mysql.com/doc/relnotes/mysql/8.0/en/news-8-0-29.html#mysqld-8-0-29-charset
+   */
   private val mysqlV = "8.0.28"
   private val nettyV = "4.1.72.Final"
   private val owlApiV = "5.1.19"
@@ -322,24 +320,6 @@ object Dependencies {
       exclude("com.google.guava", "guava-jdk5")
   ) ++ googleGenomicsV2Alpha1Dependency ++ googleLifeSciencesV2BetaDependency
 
-  private val aliyunOssDependencies = List(
-    "com.aliyun.oss" % "aliyun-sdk-oss" % aliyunOssV
-      exclude("com.sun.activation", "jakarta.activation")
-  )
-
-  private val aliyunBatchComputeDependencies = List(
-    "com.aliyun" % "aliyun-java-sdk-batchcompute" % aliyunBcsV,
-    "com.aliyun" % "aliyun-java-sdk-core" % aliyunCoreV
-      exclude("com.sun.activation", "jakarta.activation")
-  )
-
-  private val aliyunCrDependencies = List(
-    "com.aliyun" % "aliyun-java-sdk-cr" % aliyunCrV,
-    "com.aliyun" % "aliyun-java-sdk-core" % aliyunCoreV
-      exclude("com.sun.activation", "jakarta.activation"),
-    "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpV
-  )
-
   private val dbmsDependencies = List(
     "org.hsqldb" % "hsqldb" % hsqldbV,
     "org.mariadb.jdbc" % "mariadb-java-client" % mariadbV,
@@ -419,10 +399,6 @@ object Dependencies {
 
   val httpFileSystemDependencies: List[ModuleID] = akkaHttpDependencies
 
-  val ossFileSystemDependencies: List[ModuleID] = googleCloudDependencies ++ aliyunOssDependencies ++ List(
-    "com.github.pathikrit" %% "better-files" % betterFilesV
-  )
-
   val womDependencies: List[ModuleID] = List(
     "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingV,
     "io.spray" %% "spray-json" % sprayJsonV,
@@ -497,7 +473,7 @@ object Dependencies {
 
   val databaseMigrationDependencies: List[ModuleID] = liquibaseDependencies ++ dbmsDependencies
 
-  val dockerHashingDependencies: List[ModuleID] = http4sDependencies ++ circeDependencies ++ aliyunCrDependencies
+  val dockerHashingDependencies: List[ModuleID] = http4sDependencies ++ circeDependencies
 
   val cromwellApiClientDependencies: List[ModuleID] = List(
     "org.typelevel" %% "cats-effect" % catsEffectV,
@@ -544,8 +520,6 @@ object Dependencies {
     "co.fs2" %% "fs2-io" % fs2V
   ) ++ scalacheckDependencies
 
-  val bcsBackendDependencies: List[ModuleID] = commonDependencies ++ refinedTypeDependenciesList ++ aliyunBatchComputeDependencies
-
   val tesBackendDependencies: List[ModuleID] = akkaHttpDependencies
 
   val sfsBackendDependencies = List (
@@ -578,7 +552,6 @@ object Dependencies {
 
   val allProjectDependencies: List[ModuleID] =
     backendDependencies ++
-      bcsBackendDependencies ++
       centaurCwlRunnerDependencies ++
       centaurDependencies ++
       cloudSupportDependencies ++
@@ -589,7 +562,6 @@ object Dependencies {
       cwlDependencies ++
       databaseMigrationDependencies ++
       databaseSqlDependencies ++
-      dockerHashingDependencies ++
       draft2LanguageFactoryDependencies ++
       drsLocalizerDependencies ++
       engineDependencies ++
@@ -598,7 +570,6 @@ object Dependencies {
       implDrsDependencies ++
       implFtpDependencies ++
       languageFactoryDependencies ++
-      ossFileSystemDependencies ++
       perfDependencies ++
       serverDependencies ++
       sfsBackendDependencies ++
@@ -619,6 +590,14 @@ object Dependencies {
   Any dependencies that are removed may be also removed from this list.
   However, be careful about downgrading any of these dependencies.
   Older versions have known vulnerabilities, ex: CVE-2017-7525
+
+  === SECURITY UPGRADES ===
+
+  When upgrading dependencies to fix security issues, it is preferable to start with upgrading the
+  library that brings it in. Only fall back to overriding here when the latest library version still
+  has a vulnerable version of the dependency, or a major version upgrade is required and infeasible.
+  This algorithm makes it simpler to upgrade libraries in the future, because we don't have to
+  remember to remove the override.
    */
 
   val googleHttpClientDependencies = List(
@@ -703,6 +682,19 @@ object Dependencies {
     "org.asynchttpclient" % "async-http-client" % "2.10.5",
   )
 
+
+  private val nimbusdsOverrides = List(
+    "com.nimbusds" % "nimbus-jose-jwt" % "9.23",
+  )
+
+  private val bouncyCastleOverrides = List(
+    "org.bouncycastle" % "bcprov-jdk15on" % "1.70",
+  )
+
+  private val protobufJavaOverrides = List(
+    "com.google.protobuf" % "protobuf-java" % "3.21.2",
+  )
+
   /*
   If we use a version in one of our projects, that's the one we want all the libraries to use
   ...plus other groups of transitive dependencies shared across multiple projects
@@ -714,5 +706,8 @@ object Dependencies {
       rdf4jDependencyOverrides ++
       grpcDependencyOverrides ++
       scalaCollectionCompatOverrides ++
-      asyncHttpClientOverrides
+      asyncHttpClientOverrides ++
+      nimbusdsOverrides ++
+      bouncyCastleOverrides ++
+      protobufJavaOverrides
 }

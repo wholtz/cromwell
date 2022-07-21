@@ -1,11 +1,50 @@
 # Cromwell Change Log
 
+## 82 Release Notes
+
+ * Restored missing example configuration file
+ * Upgraded to latest version of the Google Cloud Storage NIO library (0.124.8)
+ * Cromwell will now finitely retry the following Google Cloud Storage I/O error.
+   * Response code `400` bad request, message `User project specified in the request is invalid`
+   * The default retry count is `5` and may be customized with `system.io.number-of-attempts`.
+
+## 81 Release Notes
+
+### Workflow labels in TES tasks
+
+Beginning in Cromwell 81 we will populate the `tags` field of tasks created by the TES backend
+with the labels applied to the workflow at creation time.  No guarantee is made about labels
+added while the workflow is running.
+
+### Alibaba BCS backend and OSS filesystem removed
+
+The BCS backend and OSS filesystem (both of which support Alibaba Cloud) have been removed.
+
 ## 80 Release Notes
 
-### Optional docker soft links
+### Direct WES support in Cromwell
 
-Cromwell now allows opting into configured soft links on shared file systems such as HPC environments. More details can
-be found [here](https://cromwell.readthedocs.io/en/stable/backends/HPC/#optional-docker-soft-links).
+Cromwell 80 no longer supports the wes2cromwell project within the Cromwell repository.
+
+In the previous release, 3 Wes2Cromwell endpoints in the Cromwell project were implemented and documented in the Swagger API. Three new endpoints,
+located within the wes2cromwell project, will also be moved, implemented, and documented within Cromwell. As a result of this, we can safely remove 
+and deprecate the wes2cromwell project from the repo.
+
+Previous endpoints:
+
+| HTTP verb | Endpoint path | Description   |
+| --------- | ------------- |---------------|
+| GET | /api/ga4gh/wes/v1/service-info | Server info |
+| POST | /api/ga4gh/wes/v1/runs/{run_id}/cancel | Abort workflow |
+| GET | /api/ga4gh/wes/v1/runs/{run_id}/status | Workflow status |
+
+Newly implemented endpoints:
+
+| HTTP verb | Endpoint path | Description     |
+| --------- | ------------- |-----------------|
+| GET | /api/ga4gh/wes/v1/runs | List workflows  |
+| POST | /api/ga4gh/wes/v1/runs | Submit workflow |
+| GET | /api/ga4gh/wes/v1/runs/{run_id} | Workflow details |
 
 ## 79 Release Notes
 

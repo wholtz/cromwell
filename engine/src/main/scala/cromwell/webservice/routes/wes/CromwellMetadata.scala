@@ -1,21 +1,6 @@
-package wes2cromwell
+package cromwell.webservice.routes.wes
 
-import spray.json.{DefaultJsonProtocol, JsObject, JsonFormat, JsonParser}
-
-final case class CromwellCallsMetadata(shardIndex: Option[Int],
-                                       commandLine: Option[String],
-                                       returnCode: Option[Int],
-                                       start: Option[String],
-                                       end: Option[String],
-                                       stdout: Option[String],
-                                       stderr: Option[String]
-                                      )
-
-object CromwellCallsMetadata {
-  import DefaultJsonProtocol._
-
-  implicit val cromwellCallsMetadataFormat: JsonFormat[CromwellCallsMetadata] = jsonFormat7(CromwellCallsMetadata.apply)
-}
+import spray.json.{JsObject, JsonFormat, JsonParser}
 
 final case class CromwellSubmittedFiles(workflow: Option[String],
                                         workflowType: Option[String],
@@ -25,11 +10,14 @@ final case class CromwellSubmittedFiles(workflow: Option[String],
                                         labels: Option[String]
                                        )
 
-object CromwellSubmittedFiles {
-  import DefaultJsonProtocol._
-
-  implicit val cromwellSubmittedFilesFormat: JsonFormat[CromwellSubmittedFiles] = jsonFormat6(CromwellSubmittedFiles.apply)
-}
+final case class CromwellCallsMetadata(shardIndex: Option[Int],
+                                       commandLine: Option[String],
+                                       returnCode: Option[Int],
+                                       start: Option[String],
+                                       end: Option[String],
+                                       stdout: Option[String],
+                                       stderr: Option[String]
+                                      )
 
 final case class CromwellMetadata(workflowName: Option[String],
                                   id: String,
@@ -48,8 +36,8 @@ final case class CromwellMetadata(workflowName: Option[String],
     val workflowEngineParams = submittedFiles.options.map(JsonParser(_).asJsObject)
 
     val workflowRequest = WesRunRequest(workflow_params = workflowParams,
-      workflow_type = submittedFiles.workflowType.getOrElse("Unable to find workflow type"),
-      workflow_type_version = submittedFiles.workflowTypeVersion.getOrElse("Unable to find workflow version"),
+      workflow_type = submittedFiles.workflowType.getOrElse("None supplied"),
+      workflow_type_version = submittedFiles.workflowTypeVersion.getOrElse("None supplied"),
       tags = workflowTags,
       workflow_engine_parameters = workflowEngineParams,
       workflow_url = None
@@ -74,7 +62,7 @@ final case class CromwellMetadata(workflowName: Option[String],
     WesRunLog(
       run_id = id,
       request = workflowRequest,
-      state = WesState.fromCromwellStatus(status),
+      state = WesState.fromStatusString(Option(status)),
       run_log = Option(workflowLogData),
       task_logs = Option(taskLogs),
       outputs = outputs
@@ -83,8 +71,10 @@ final case class CromwellMetadata(workflowName: Option[String],
 }
 
 object CromwellMetadata {
-  import DefaultJsonProtocol._
+  import spray.json.DefaultJsonProtocol._
 
+  implicit val cromwellCallsMetadataFormat: JsonFormat[CromwellCallsMetadata] = jsonFormat7(CromwellCallsMetadata.apply)
+  implicit val cromwellSubmittedFilesFormat: JsonFormat[CromwellSubmittedFiles] = jsonFormat6(CromwellSubmittedFiles.apply)
   implicit val cromwellMetadataFormat: JsonFormat[CromwellMetadata] = jsonFormat8(CromwellMetadata.apply)
 
   def fromJson(json: String): CromwellMetadata = {
