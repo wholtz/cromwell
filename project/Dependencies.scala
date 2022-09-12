@@ -6,10 +6,11 @@ object Dependencies {
   private val akkaV = "2.5.32" // scala-steward:off (CROM-6637)
   private val ammoniteOpsV = "2.4.1"
   private val apacheHttpClientV = "4.5.13"
-  private val awsSdkV = "2.17.152"
+  private val awsSdkV = "2.17.194"
   // We would like to use the BOM to manage Azure SDK versions, but SBT doesn't support it.
   // https://github.com/Azure/azure-sdk-for-java/tree/main/sdk/boms/azure-sdk-bom
   // https://github.com/sbt/sbt/issues/4531
+  private val azureStorageBlobNioV = "12.0.0-beta.18"
   private val azureIdentitySdkV = "1.4.2"
   private val azureKeyVaultSdkV = "4.3.7"
   private val betterFilesV = "3.9.1"
@@ -181,12 +182,17 @@ object Dependencies {
   )
 
   val azureDependencies: List[ModuleID] = List(
+    "com.azure" % "azure-storage-blob-nio" % azureStorageBlobNioV
+      exclude("jakarta.xml.bind", "jakarta.xml.bind-api")
+      exclude("jakarta.activation", "jakarta.activation-api"),
     "com.azure" % "azure-identity" % azureIdentitySdkV
       exclude("jakarta.xml.bind", "jakarta.xml.bind-api")
       exclude("jakarta.activation", "jakarta.activation-api"),
     "com.azure" % "azure-security-keyvault-secrets" % azureKeyVaultSdkV
       exclude("jakarta.xml.bind", "jakarta.xml.bind-api")
-      exclude("jakarta.activation", "jakarta.activation-api")
+      exclude("jakarta.activation", "jakarta.activation-api"),
+    "com.azure" % "azure-core-management" % "1.7.0",
+    "com.azure.resourcemanager" % "azure-resourcemanager" % "2.17.0"
   )
 
   val implFtpDependencies = List(
@@ -398,6 +404,8 @@ object Dependencies {
   private val testDatabaseDependencies =
     List("scalatest", "mysql", "mariadb", "postgresql")
       .map(name => "com.dimafeng" %% s"testcontainers-scala-$name" % testContainersScalaV % Test)
+
+  val blobFileSystemDependencies: List[ModuleID] = azureDependencies
 
   val s3FileSystemDependencies: List[ModuleID] = junitDependencies
 

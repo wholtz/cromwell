@@ -519,7 +519,7 @@ class PipelinesApiBackendCacheHitCopyingActorSpec extends TestKitSuite
     actorUnderTest
   }
 
-  private def buildCopyCommand(hitId: Int, bucket: String): CopyOutputsCommand = {
+  private def buildCopyCommand(hitId: Long, bucket: String): CopyOutputsCommand = {
     val callRoot = s"gs://$bucket/workflow-id/call-name"
     val rcFile = callRoot + "/rc"
 
