@@ -1,5 +1,75 @@
 # Cromwell Change Log
 
+## 85 Release Notes
+
+### Migration of PKs to BIGINT
+
+The PK of below tables will be migrated from INT to BIGINT. Also, since `ROOT_WORKFLOW_ID` in `SUB_WORKFLOW_STORE_ENTRY` is a FK to `WORKFLOW_STORE_ENTRY_ID` in `WORKFLOW_STORE_ENTRY` 
+it is also being migrated from INT to BIGINT.
+* DOCKER_HASH_STORE_ENTRY
+* WORKFLOW_STORE_ENTRY
+* SUB_WORKFLOW_STORE_ENTRY
+
+## 84 Release Notes
+
+### CromIAM enabled user checks
+
+For Cromwell instances utilizing the optional CromIAM identity and access management component, the following endpoints now verify that the calling user is enabled before forwarding the request.
+* `/api/workflows/v1/backends`
+* `/api/womtool/v1/describe`
+
+This change makes the above endpoints consistent with the existing behavior of all the other endpoints in the `/api/` path of CromIAM. 
+
+## 83 Release Notes
+
+* Changes the type of several primary key columns in call caching tables from int to bigint. The database migration may be lengthy if your database contains a large amount of call caching data.
+
+## 82 Release Notes
+
+ * Restored missing example configuration file
+ * Upgraded to latest version of the Google Cloud Storage NIO library (0.124.8)
+ * Cromwell will now finitely retry the following Google Cloud Storage I/O error.
+   * Response code `400` bad request, message `User project specified in the request is invalid`
+   * The default retry count is `5` and may be customized with `system.io.number-of-attempts`.
+
+## 81 Release Notes
+
+### Workflow labels in TES tasks
+
+Beginning in Cromwell 81 we will populate the `tags` field of tasks created by the TES backend
+with the labels applied to the workflow at creation time.  No guarantee is made about labels
+added while the workflow is running.
+
+### Alibaba BCS backend and OSS filesystem removed
+
+The BCS backend and OSS filesystem (both of which support Alibaba Cloud) have been removed.
+
+## 80 Release Notes
+
+### Direct WES support in Cromwell
+
+Cromwell 80 no longer supports the wes2cromwell project within the Cromwell repository.
+
+In the previous release, 3 Wes2Cromwell endpoints in the Cromwell project were implemented and documented in the Swagger API. Three new endpoints,
+located within the wes2cromwell project, will also be moved, implemented, and documented within Cromwell. As a result of this, we can safely remove 
+and deprecate the wes2cromwell project from the repo.
+
+Previous endpoints:
+
+| HTTP verb | Endpoint path | Description   |
+| --------- | ------------- |---------------|
+| GET | /api/ga4gh/wes/v1/service-info | Server info |
+| POST | /api/ga4gh/wes/v1/runs/{run_id}/cancel | Abort workflow |
+| GET | /api/ga4gh/wes/v1/runs/{run_id}/status | Workflow status |
+
+Newly implemented endpoints:
+
+| HTTP verb | Endpoint path | Description     |
+| --------- | ------------- |-----------------|
+| GET | /api/ga4gh/wes/v1/runs | List workflows  |
+| POST | /api/ga4gh/wes/v1/runs | Submit workflow |
+| GET | /api/ga4gh/wes/v1/runs/{run_id} | Workflow details |
+
 ## 79 Release Notes
 
 ### Last release with CWL support
