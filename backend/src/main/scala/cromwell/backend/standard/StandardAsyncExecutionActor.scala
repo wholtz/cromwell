@@ -1137,6 +1137,14 @@ trait StandardAsyncExecutionActor
     Future.successful(FailedNonRetryableExecutionHandle(exception, returnCode, None))
   }
 
+  /**
+    * A latch that says the actor has entered an aborting state. This is used to differentiate kills requested
+    * via Cromwell versus kills due to OOM, etc. Volatile as this actor mixes use of the "synchronous" mailbox
+    * with asynchronous Scala futures that may read the value from another thread.
+    */
+  @volatile
+  private var aborting = false
+
   // See executeOrRecoverSuccess
   private var missedAbort = false
   private case class CheckMissedAbort(jobId: StandardAsyncJob)
@@ -1145,6 +1153,7 @@ trait StandardAsyncExecutionActor
 
   def standardReceiveBehavior(jobIdOption: Option[StandardAsyncJob]): Receive = LoggingReceive {
     case AbortJobCommand =>
+      aborting = true
       jobIdOption match {
         case Some(jobId) =>
           Try(tryAbort(jobId)) match {
@@ -1353,7 +1362,7 @@ trait StandardAsyncExecutionActor
             case Success(returnCodeAsInt) if failOnStdErr && stderrSize.intValue > 0 =>
               val executionHandle = Future.successful(FailedNonRetryableExecutionHandle(StderrNonEmpty(jobDescriptor.key.tag, stderrSize, stderrAsOption), Option(returnCodeAsInt), None))
               retryElseFail(executionHandle)
-            case Success(returnCodeAsInt) if isAbort(returnCodeAsInt) =>
+            case Success(returnCodeAsInt) if aborting && isAbort(returnCodeAsInt) =>
               Future.successful(AbortedExecutionHandle)
             case Success(returnCodeAsInt) if continueOnReturnCode.continueFor(returnCodeAsInt) =>
               handleExecutionSuccess(status, oldHandle, returnCodeAsInt)
